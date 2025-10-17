@@ -1,11 +1,11 @@
 +++
 title = "How to Enable AirPlay Audio on Linux (ThinkPad ALC257 + ALSA Only)"
-date = "2025-10-17T22:26:15"
+date = "2025-10-17T14:25:13-05:00"
 description = "Fixing broken PulseAudio on ThinkPads with Realtek ALC257 and setting up direct AirPlay via Shairport-Sync using ALSA only."
 author = "Justin Napolitano"
 categories = ["projects", "audio", "linux"]
 tags = ["ubuntu", "alsa", "airplay", "thinkpad", "shairport-sync"]
-image = "airplay-thinkpad.png"
+#image = "airplay-thinkpad.png"
 [extra]
 lang = "en"
 toc = true
