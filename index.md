@@ -10,6 +10,7 @@ tags = ["ubuntu", "alsa", "airplay", "thinkpad", "shairport-sync"]
 lang = "en"
 toc = true
 featured = false
+reaction = false
 +++
 
 # AirPlay Audio on Linux ThinkPad (No PulseAudio, ALSA Only)
