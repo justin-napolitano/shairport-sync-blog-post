@@ -1,21 +1,26 @@
-+++
-title = "How to Enable AirPlay Audio on Linux (ThinkPad ALC257 + ALSA Only)"
-date = "2025-10-17T14:25:13-05:00"
-description = "Fixing broken PulseAudio on ThinkPads with Realtek ALC257 and setting up direct AirPlay via Shairport-Sync using ALSA only."
-author = "Justin Napolitano"
-categories = ["projects", "audio", "linux"]
-tags = ["ubuntu", "alsa", "airplay", "thinkpad", "shairport-sync"]
-#image = "airplay-thinkpad.png"
-[extra]
-lang = "en"
-toc = true
-featured = false
-reaction = false
-+++
+---
+slug: "github-shairport-sync-blog-post"
+title: "shairport-sync-blog-post"
+repo: "justin-napolitano/shairport-sync-blog-post"
+githubUrl: "https://github.com/justin-napolitano/shairport-sync-blog-post"
+generatedAt: "2025-11-23T09:36:15.402391Z"
+source: "github-auto"
+---
+
+
+---
+title: How to Enable AirPlay Audio on Linux (ThinkPad ALC257 + ALSA Only)
+date: 2025-10-17
+categories: [projects, audio, linux]
+tags: [ubuntu, alsa, airplay, thinkpad, shairport-sync]
+author: Justin Napolitano
+---
 
 # AirPlay Audio on Linux ThinkPad (No PulseAudio, ALSA Only)
 
-Most modern ThinkPads use the **Realtek ALC257** codec. On Ubuntu 24.04+ (kernel ≥ 6.8), the sound subsystem often loads but PulseAudio or PipeWire fails to expose it, leading to:
+This document addresses a specific problem encountered on modern ThinkPads equipped with the Realtek ALC257 audio codec running Ubuntu 24.04 or later with kernel version 6.8 or higher. The issue is that while the ALSA kernel sound subsystem loads correctly, PulseAudio or PipeWire fails to recognize or expose the audio device, rendering it unusable for typical sound applications.
+
+Typical symptoms include the absence of soundcards in ALSA's `aplay` listing and an empty or null sink in PulseAudio:
 
 ```
 aplay: device_list:274: no soundcards found...
@@ -23,34 +28,55 @@ pactl list short sinks
 0 auto_null module-null-sink.c s16le 2ch 44100Hz IDLE
 ```
 
-This guide fixes that and sets up **Shairport-Sync** to stream AirPlay audio directly through ALSA.
+This project provides a practical workaround by bypassing PulseAudio and PipeWire entirely, instead using Shairport-Sync to stream AirPlay audio directly through ALSA.
 
----
+## Motivation
 
-## Step 1 – Verify Kernel Driver and Codec
+The primary motivation is to restore functional AirPlay audio streaming on hardware where the conventional Linux audio stack components fail to expose the sound device properly. This is particularly relevant for ThinkPads with the Realtek ALC257 codec, which is common but problematic under the given software environment.
+
+## Problem Statement
+
+- Kernel-level ALSA drivers load and recognize the codec.
+- User-space audio servers (PulseAudio, PipeWire) do not detect or expose the sound hardware.
+- Resulting in no usable audio output for typical applications.
+
+## Solution Overview
+
+The solution involves:
+
+1. Verifying kernel-level ALSA device presence.
+2. Installing necessary build dependencies.
+3. Building Shairport-Sync from source with ALSA, Avahi, and SSL support.
+4. Configuring Shairport-Sync to output directly to ALSA.
+
+This approach bypasses the broken PulseAudio/PipeWire layer and leverages ALSA directly for audio playback.
+
+## Implementation Details
+
+### Step 1: Verify Kernel Driver and Codec
+
+Run:
+
 ```bash
 sudo dmesg | grep -E "snd|sof|hdaudio"
 aplay -l
 ```
 
-Expect output similar to:
-```
-HDA:10ec0257,17aa2279,00100001
-```
+Confirm that the output includes the Realtek ALC257 codec identifier and that `/dev/snd/*` devices exist.
 
-If `/dev/snd/*` exists, ALSA is working at the kernel level.
+### Step 2: Install Dependencies
 
----
+Install build tools and libraries required for Shairport-Sync:
 
-## Step 2 – Install Dependencies
 ```bash
 sudo apt update
-sudo apt install -y build-essential git autoconf automake libtool   libdaemon-dev libpopt-dev libconfig-dev libasound2-dev avahi-daemon   libavahi-client-dev libssl-dev sox
+sudo apt install -y build-essential git autoconf automake libtool libdaemon-dev libpopt-dev libconfig-dev libasound2-dev avahi-daemon libavahi-client-dev libssl-dev sox
 ```
 
----
+### Step 3: Build Shairport-Sync
 
-## Step 3 – Build Shairport-Sync from Source
+Clone the official Shairport-Sync repository and build with the necessary options:
+
 ```bash
 git clone https://github.com/mikebrady/shairport-sync.git
 cd shairport-sync
@@ -60,148 +86,33 @@ make
 sudo make install
 ```
 
----
+### Step 4: Minimal Configuration
 
-## Step 4 – Minimal Config
-```bash
-sudo tee /usr/local/etc/shairport-sync.conf >/dev/null <<'EOF'
+Create a configuration file `/usr/local/etc/shairport-sync.conf` with minimal settings to direct output to ALSA:
+
+```ini
 general = { name = "ThinkPad-AirPlay"; mdns_backend = "avahi"; diagnostics = { log_verbosity = 2; }; };
 alsa = {
   output_device = "plughw:0,0";
   use_mmap = "no";
   output_format = "S16";
-  output_rate = 44100;
 };
-EOF
 ```
 
----
+### Step 5: Run Shairport-Sync
 
-## Step 5 – Unmute and Test ALSA
-```bash
-amixer -c 0 sset 'Headphone' 100% unmute
-amixer -c 0 sset 'Auto-Mute Mode' Disabled
-aplay /usr/share/sounds/alsa/Front_Center.wav
-```
-
-If you hear “Front Center,” the codec works.
-
----
-
-## Step 6 – Firewall and Avahi
-```bash
-sudo ufw allow 5000,6001:6010,7000/tcp
-sudo ufw allow 5353,6001:6010/udp
-sudo systemctl enable --now avahi-daemon
-```
-
----
-
-## Step 7 – Systemd Service
-```bash
-sudo tee /etc/systemd/system/shairport-sync.service >/dev/null <<'EOF'
-[Unit]
-Description=Shairport Sync AirPlay Receiver
-After=network-online.target sound.target avahi-daemon.service
-Wants=network-online.target
-
-[Service]
-ExecStart=/usr/local/bin/shairport-sync -o alsa -- -d plughw:0,0
-Restart=always
-User=shairport
-Group=audio
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo useradd -r -s /usr/sbin/nologin -G audio shairport || true
-sudo systemctl daemon-reload
-sudo systemctl enable --now shairport-sync
-```
-
----
-
-## Step 8 – Verification
-```bash
-sudo journalctl -u shairport-sync -f
-```
-Look for:
-```
-Connection 1: ANNOUNCE
-Connection 1: RECORD
-alsa: PCM start
-```
-Your ThinkPad now appears as **“ThinkPad-AirPlay”** on iOS/macOS devices.
-
----
-
-## Full Install Script
-
-Save as `install_airplay_thinkpad.sh` and run with:
+Start the service manually or configure it to run as a daemon:
 
 ```bash
-sudo bash install_airplay_thinkpad.sh
+shairport-sync
 ```
 
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
+## Notes
 
-echo "[+] Installing dependencies..."
-apt update
-apt install -y build-essential git autoconf automake libtool libdaemon-dev   libpopt-dev libconfig-dev libasound2-dev avahi-daemon   libavahi-client-dev libssl-dev sox ufw
+- This setup circumvents the broken PulseAudio/PipeWire layer but does not address the underlying cause of their failure.
+- The configuration disables memory-mapped I/O (`use_mmap = "no"`) which may be necessary for compatibility with the hardware or driver.
+- The output device `plughw:0,0` assumes the primary ALSA hardware device; adjust as necessary.
 
-echo "[+] Cloning Shairport Sync..."
-cd /tmp
-git clone https://github.com/mikebrady/shairport-sync.git
-cd shairport-sync
-autoreconf -fi
-./configure --with-alsa --with-avahi --with-ssl=openssl --with-soxr
-make
-make install
+## Conclusion
 
-echo "[+] Creating config..."
-tee /usr/local/etc/shairport-sync.conf >/dev/null <<'EOF'
-general = { name = "ThinkPad-AirPlay"; mdns_backend = "avahi"; diagnostics = { log_verbosity = 2; }; };
-alsa = { output_device = "plughw:0,0"; use_mmap = "no"; output_format = "S16"; output_rate = 44100; };
-EOF
-
-echo "[+] Adjusting audio mixer..."
-amixer -c 0 sset 'Headphone' 100% unmute || true
-amixer -c 0 sset 'Auto-Mute Mode' Disabled || true
-
-echo "[+] Opening firewall..."
-ufw allow 5000,6001:6010,7000/tcp
-ufw allow 5353,6001:6010/udp
-ufw reload
-
-echo "[+] Creating systemd service..."
-tee /etc/systemd/system/shairport-sync.service >/dev/null <<'EOF'
-[Unit]
-Description=Shairport Sync AirPlay Receiver
-After=network-online.target sound.target avahi-daemon.service
-Wants=network-online.target
-
-[Service]
-ExecStart=/usr/local/bin/shairport-sync -o alsa -- -d plughw:0,0
-Restart=always
-User=shairport
-Group=audio
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-useradd -r -s /usr/sbin/nologin -G audio shairport 2>/dev/null || true
-systemctl daemon-reload
-systemctl enable --now shairport-sync
-
-echo "[+] Done. Your AirPlay receiver is ready as 'ThinkPad-AirPlay'."
-```
-
----
-
-## Result
-You now have a completely PulseAudio-free, AirPlay-enabled ThinkPad using only **ALSA + Avahi + Shairport-Sync**.  
-Lightweight, fast, and scriptable.
+This project serves as a practical reference for enabling AirPlay audio streaming on Linux ThinkPads with problematic audio stacks. It prioritizes direct ALSA usage and provides a reproducible build and configuration process for Shairport-Sync. Future work may involve diagnosing and fixing PulseAudio/PipeWire integration or expanding hardware support.
