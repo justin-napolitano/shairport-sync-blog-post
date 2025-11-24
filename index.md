@@ -1,12 +1,28 @@
 ---
-slug: "github-shairport-sync-blog-post"
-title: "shairport-sync-blog-post"
-repo: "justin-napolitano/shairport-sync-blog-post"
-githubUrl: "https://github.com/justin-napolitano/shairport-sync-blog-post"
-generatedAt: "2025-11-23T09:36:15.402391Z"
-source: "github-auto"
+slug: github-shairport-sync-blog-post
+title: Streaming AirPlay Audio on Linux ThinkPad Using ALSA and Shairport-Sync
+repo: justin-napolitano/shairport-sync-blog-post
+githubUrl: https://github.com/justin-napolitano/shairport-sync-blog-post
+generatedAt: '2025-11-23T09:36:15.402391Z'
+source: github-auto
+summary: >-
+  Instructions for enabling AirPlay audio on Linux ThinkPads with Realtek ALC257 codec by bypassing
+  PulseAudio and using Shairport-Sync with ALSA.
+tags:
+  - linux
+  - thinkpad
+  - alsa
+  - shairport-sync
+  - airplay
+  - audio-streaming
+seoPrimaryKeyword: airplay audio linux thinkpad
+seoSecondaryKeywords:
+  - shairport-sync
+  - alsa
+  - realtek alc257
+  - pulseaudio workaround
+seoOptimized: true
 ---
-
 
 ---
 title: How to Enable AirPlay Audio on Linux (ThinkPad ALC257 + ALSA Only)
@@ -116,3 +132,4 @@ shairport-sync
 ## Conclusion
 
 This project serves as a practical reference for enabling AirPlay audio streaming on Linux ThinkPads with problematic audio stacks. It prioritizes direct ALSA usage and provides a reproducible build and configuration process for Shairport-Sync. Future work may involve diagnosing and fixing PulseAudio/PipeWire integration or expanding hardware support.
+
