@@ -22,6 +22,14 @@ seoSecondaryKeywords:
   - realtek alc257
   - pulseaudio workaround
 seoOptimized: true
+topicFamily: devtools
+topicFamilyConfidence: 0.95
+topicFamilyNotes: >-
+  The blog post focuses on Linux audio device setup, ALSA kernel drivers, and building and
+  configuring Shairport-Sync on a Linux ThinkPad. These topics align with dev environment setup,
+  OS-level configuration, and development tooling covered in the 'Devtools' family. Other families
+  like automation or static are less relevant because the post is hardware and OS setup oriented
+  rather than about scripting pipelines, automation, or static site creation.
 ---
 
 ---
@@ -132,4 +140,5 @@ shairport-sync
 ## Conclusion
 
 This project serves as a practical reference for enabling AirPlay audio streaming on Linux ThinkPads with problematic audio stacks. It prioritizes direct ALSA usage and provides a reproducible build and configuration process for Shairport-Sync. Future work may involve diagnosing and fixing PulseAudio/PipeWire integration or expanding hardware support.
+
 
