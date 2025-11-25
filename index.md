@@ -1,13 +1,13 @@
 ---
 slug: github-shairport-sync-blog-post
-title: Streaming AirPlay Audio on Linux ThinkPad Using ALSA and Shairport-Sync
+title: Enable AirPlay Audio on Linux ThinkPad with ALSA
 repo: justin-napolitano/shairport-sync-blog-post
 githubUrl: https://github.com/justin-napolitano/shairport-sync-blog-post
 generatedAt: '2025-11-23T09:36:15.402391Z'
 source: github-auto
 summary: >-
-  Instructions for enabling AirPlay audio on Linux ThinkPads with Realtek ALC257 codec by bypassing
-  PulseAudio and using Shairport-Sync with ALSA.
+  Learn how to stream AirPlay audio on Linux ThinkPads using ALSA, bypassing
+  PulseAudio and PipeWire for direct audio output.
 tags:
   - linux
   - thinkpad
@@ -15,21 +15,25 @@ tags:
   - shairport-sync
   - airplay
   - audio-streaming
-seoPrimaryKeyword: airplay audio linux thinkpad
+seoPrimaryKeyword: airplay audio on linux thinkpad
 seoSecondaryKeywords:
-  - shairport-sync
-  - alsa
+  - shairport-sync setup
+  - alsa audio streaming
+  - linux audio issues
   - realtek alc257
-  - pulseaudio workaround
+  - ubuntu audio configuration
 seoOptimized: true
 topicFamily: devtools
 topicFamilyConfidence: 0.95
 topicFamilyNotes: >-
-  The blog post focuses on Linux audio device setup, ALSA kernel drivers, and building and
-  configuring Shairport-Sync on a Linux ThinkPad. These topics align with dev environment setup,
-  OS-level configuration, and development tooling covered in the 'Devtools' family. Other families
-  like automation or static are less relevant because the post is hardware and OS setup oriented
+  The blog post focuses on Linux audio device setup, ALSA kernel drivers, and
+  building and configuring Shairport-Sync on a Linux ThinkPad. These topics
+  align with dev environment setup, OS-level configuration, and development
+  tooling covered in the 'Devtools' family. Other families like automation or
+  static are less relevant because the post is hardware and OS setup oriented
   rather than about scripting pipelines, automation, or static site creation.
+kind: project
+id: github-shairport-sync-blog-post
 ---
 
 ---
