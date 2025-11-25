@@ -7,8 +7,8 @@ githubUrl: https://github.com/justin-napolitano/shairport-sync-blog-post
 generatedAt: '2025-11-24T21:36:18.434Z'
 source: github-auto
 summary: >-
-  A guide to configure Shairport-Sync for AirPlay audio streaming on Linux
-  ThinkPads using ALSA with Realtek ALC257 codec.
+  A guide to configure Shairport-Sync for AirPlay audio streaming on Linux ThinkPads using ALSA with
+  Realtek ALC257 codec.
 tags:
   - shairport-sync
   - alsa
@@ -27,8 +27,8 @@ seoSecondaryKeywords:
   - realtek alc257
   - avahi service discovery
 seoOptimized: true
-topicFamily: null
-topicFamilyConfidence: null
+topicFamily: devtools
+topicFamilyConfidence: 0.9
 kind: project
 entryLayout: project
 showInProjects: true
@@ -118,4 +118,5 @@ shairport-sync
 - Add troubleshooting section for common ALSA and Shairport-Sync issues.
 - Automate configuration generation based on detected hardware.
 - Explore integration with PipeWire or PulseAudio once ALSA issues are resolved.
+
 
